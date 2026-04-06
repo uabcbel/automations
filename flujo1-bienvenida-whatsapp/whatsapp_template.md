@@ -3,7 +3,7 @@
 ## Texto de la plantilla
 
 ```
-¡Hola {{1}}! 👋 Te confirmamos tu reserva en Gran Hotel Peñíscola:
+¡Hola {{1}}! 👋 Te confirmamos tu reserva en GHP:
 
 📅 Llegada: {{2}}
 📅 Salida: {{3}}
@@ -56,7 +56,7 @@ Completa estos datos al crear la plantilla en el portal de 360dialog o Twilio:
 ## Variante sin emojis (si Meta rechaza la versión con emojis)
 
 ```
-Hola {{1}}, te confirmamos tu reserva en Gran Hotel Peñíscola:
+Hola {{1}}, te confirmamos tu reserva en GHP:
 
 Llegada: {{2}}
 Salida: {{3}}

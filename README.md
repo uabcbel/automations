@@ -1,6 +1,6 @@
-# Automations — Gran Hotel Peñíscola
+# Automations — GHP
 
-Make.com automation flows for Gran Hotel Peñíscola, built and maintained by César Beltran Miralles.
+Make.com automation flows for GHP, built and maintained by César Beltran Miralles.
 
 ## Flows
 
