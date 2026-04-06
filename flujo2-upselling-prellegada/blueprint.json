@@ -1,0 +1,256 @@
+{
+  "name": "Flujo 2 - Upselling Pre-Llegada GHP",
+  "flow": [
+    {
+      "id": 1,
+      "module": "builtin:BasicScheduler",
+      "version": 1,
+      "parameters": {
+        "interval": 1440,
+        "unit": "minutes",
+        "startDate": "__FILL_IN__START_DATE_YYYY-MM-DD",
+        "advanced": {
+          "hour": 10,
+          "minute": 0,
+          "restrict": "allDays"
+        }
+      },
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "__NOTE__": "Runs daily at 10:00 AM. Set startDate to today's date in YYYY-MM-DD format."
+      }
+    },
+    {
+      "id": 2,
+      "module": "google-sheets:ActionSearchRows",
+      "version": 2,
+      "parameters": {
+        "__INSTRUCTION__": "Connect your Google account and select the same spreadsheet used in Flujo 1",
+        "account": "__FILL_IN__GOOGLE_SHEETS_CONNECTION_ID",
+        "spreadsheetId": "__FILL_IN__SPREADSHEET_ID",
+        "sheetId": "__FILL_IN__SHEET_NAME_Reservas_GHP_2026",
+        "includesHeaders": true
+      },
+      "mapper": {
+        "filter": {
+          "conditions": [
+            [
+              {
+                "a": "{{fecha_upsell}}",
+                "b": "{{formatDate(now; 'DD/MM/YYYY')}}",
+                "o": "text:equal"
+              },
+              {
+                "a": "{{upsell_enviado}}",
+                "b": "No",
+                "o": "text:equal"
+              }
+            ]
+          ]
+        },
+        "maxResults": 100
+      },
+      "metadata": {
+        "designer": { "x": 200, "y": 0 },
+        "__NOTE__": "Returns all rows where fecha_upsell = today AND upsell_enviado = No. If 0 results the scenario ends cleanly — normal on days with no check-ins in 3 days."
+      }
+    },
+    {
+      "id": 3,
+      "module": "builtin:BasicIterator",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "array": "{{2.rows}}"
+      },
+      "metadata": {
+        "designer": { "x": 400, "y": 0 },
+        "__NOTE__": "Processes each matching row independently."
+      }
+    },
+    {
+      "id": 4,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "parameters": {},
+      "metadata": {
+        "designer": { "x": 600, "y": 0 }
+      },
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 5,
+              "module": "http:ActionSendData",
+              "version": 3,
+              "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+              },
+              "filter": {
+                "name": "Tiene telefono y upsell no enviado",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{3.Telefono}}",
+                      "b": "",
+                      "o": "text:notequal"
+                    },
+                    {
+                      "a": "{{3.Telefono}}",
+                      "b": "null",
+                      "o": "text:notequal"
+                    },
+                    {
+                      "a": "{{3.upsell_enviado}}",
+                      "b": "No",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "mapper": {
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{__FILL_IN__GEMINI_API_KEY}}",
+                "method": "POST",
+                "headers": [
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "bodyType": "raw",
+                "contentType": "application/json",
+                "body": "{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Eres el asistente del Gran Hotel Peñíscola, un hotel 4 estrellas en la Costa del Azahar. Redacta un mensaje de WhatsApp breve (máximo 160 palabras) para {{3.Nombre}}, que llega el {{3.Check-in}} con {{3.Personas}} persona(s) en {{3.Habitacion}}.\\nREGLAS:\\n- Tono: amigable y cercano, nunca comercial agresivo ni con signos de exclamación en exceso.\\n- Menciona que queda poco para su llegada y que quieres que su estancia sea perfecta.\\n- Ofrece exactamente 2 o 3 servicios de la lista de abajo, adaptados al perfil del huésped:\\n  Si num_personas = 2: prioriza 'upgrade habitación vista al mar (+30€/noche)' y 'cena romántica en el restaurante (45€/persona)'.\\n  Si num_personas >= 3: prioriza 'parking cubierto (12€/día)' y 'early check-in desde las 10h (+25€)'.\\n  En cualquier caso, puedes añadir como tercera opción: 'acceso spa + masaje (60€/persona)'.\\n- Termina siempre con: 'Puedes reservar cualquier servicio extra aquí:' seguido de https://granhotelpeniscola.com/extras\\n- NO uses listas con viñetas en el mensaje. Escribe en prosa natural.\\n- NO incluyas emojis excepto 1 al inicio del mensaje.\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 300\n  }\n}"
+              },
+              "metadata": {
+                "designer": { "x": 800, "y": -200 }
+              }
+            },
+            {
+              "id": 6,
+              "module": "http:ActionSendData",
+              "version": 3,
+              "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+              },
+              "mapper": {
+                "url": "https://waba.360dialog.io/v1/messages",
+                "method": "POST",
+                "headers": [
+                  {
+                    "name": "D360-API-KEY",
+                    "value": "__FILL_IN__360DIALOG_API_KEY"
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "bodyType": "raw",
+                "contentType": "application/json",
+                "body": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{replace(replace(3.Telefono; ' '; ''); '+'; '')}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{5.body.candidates[].content.parts[].text}}\"\n  }\n}",
+                "__NOTE__": "Sends as free-form text (no template needed) because the guest already has an active conversation from Flujo 1. If the 24h window has expired, 360dialog will return an error — see setup.md for the fallback template approach."
+              },
+              "metadata": {
+                "designer": { "x": 1000, "y": -200 }
+              }
+            },
+            {
+              "id": 7,
+              "module": "google-sheets:ActionUpdateRow",
+              "version": 2,
+              "parameters": {
+                "account": "__FILL_IN__GOOGLE_SHEETS_CONNECTION_ID",
+                "spreadsheetId": "__FILL_IN__SPREADSHEET_ID",
+                "sheetId": "__FILL_IN__SHEET_NAME_Reservas_GHP_2026",
+                "includesHeaders": true
+              },
+              "mapper": {
+                "rowNumber": "{{3.__ROW_NUMBER__}}",
+                "values": {
+                  "upsell_enviado": "Sí",
+                  "fecha_envio_upsell": "{{formatDate(now; 'DD/MM/YYYY HH:mm')}}"
+                }
+              },
+              "metadata": {
+                "designer": { "x": 1200, "y": -200 },
+                "__NOTE__": "Closes the anti-duplicate loop. After this update, the row will never be picked up again by the filter in module 2."
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 8,
+              "module": "gmail:ActionSendEmail",
+              "version": 1,
+              "parameters": {
+                "account": "__FILL_IN__GMAIL_CONNECTION_ID"
+              },
+              "filter": {
+                "name": "Sin telefono",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{3.Telefono}}",
+                      "b": "",
+                      "o": "text:equal"
+                    }
+                  ],
+                  [
+                    {
+                      "a": "{{3.Telefono}}",
+                      "b": "null",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "mapper": {
+                "to": "__FILL_IN__RECEPCION_EMAIL",
+                "subject": "⚠️ Upselling no enviado — sin teléfono: {{3.Nombre}} (check-in {{3.Check-in}})",
+                "content": "<p>El flujo de upselling pre-llegada <strong>no pudo enviar el WhatsApp</strong> a este huésped por falta de número de teléfono.</p><ul><li><strong>Nombre:</strong> {{3.Nombre}}</li><li><strong>Check-in:</strong> {{3.Check-in}}</li><li><strong>Habitación:</strong> {{3.Habitacion}}</li><li><strong>Personas:</strong> {{3.Personas}}</li><li><strong>ID reserva:</strong> {{3.ID_Reserva}}</li></ul><p>Por favor, contactad manualmente con el huésped para ofrecerle los servicios adicionales.</p>",
+                "contentType": "html"
+              },
+              "metadata": {
+                "designer": { "x": 800, "y": 200 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu1.make.com",
+    "__SETUP_NOTES__": [
+      "PREREQUISITE: Flujo 1 must be active for at least 1 week with real reservation data in Sheets",
+      "1. Import this file via Make.com > Scenarios > ... > Import Blueprint",
+      "2. Search for all __FILL_IN__ placeholders and replace with real values",
+      "3. Same Google Sheets connection and spreadsheet as Flujo 1",
+      "4. Same 360dialog API key as Flujo 1 — no new WhatsApp account needed",
+      "5. Same Gemini API key as Flujo 1",
+      "6. Test by adding 3 manual rows in Sheets with fecha_upsell = today, then run manually",
+      "7. Confirm prices in the Gemini prompt match actual hotel prices before activating",
+      "8. Add columns upsell_convertido, upsell_servicio, upsell_importe to Sheets for ROI tracking"
+    ]
+  }
+}

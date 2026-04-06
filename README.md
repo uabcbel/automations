@@ -7,7 +7,7 @@ Make.com automation flows for Gran Hotel Peñíscola, built and maintained by C�
 | # | Folder | Description | Status |
 |---|--------|-------------|--------|
 | 1 | [`flujo1-bienvenida-whatsapp/`](flujo1-bienvenida-whatsapp/) | Automatic WhatsApp welcome message on Booking.com reservation confirmation | Ready to deploy |
-| 2 | _(coming soon)_ | Pre-arrival upselling (reads from Flujo 1 Sheets) | Planned |
+| 2 | [`flujo2-upselling-prellegada/`](flujo2-upselling-prellegada/) | AI-personalized WhatsApp upselling 3 days before check-in | Ready to deploy |
 | 3 | _(coming soon)_ | Post-checkout survey + win-back | Planned |
 
 ## How to use
