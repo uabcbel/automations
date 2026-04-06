@@ -1,0 +1,320 @@
+{
+  "name": "Flujo 1 - Bienvenida WhatsApp GHP",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gmail:TriggerEmail",
+      "version": 1,
+      "parameters": {
+        "__INSTRUCTION__": "Connect your Gmail account and set the folder to INBOX",
+        "account": "__FILL_IN__GMAIL_CONNECTION_ID",
+        "label": "INBOX",
+        "sender": "noreply@booking.com",
+        "subject": "Nueva reserva",
+        "includeSpamTrash": false
+      },
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {
+          "parameters": {
+            "account": { "label": "__FILL_IN__GMAIL_ACCOUNT_LABEL" }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicFeeder",
+      "version": 1,
+      "parameters": {},
+      "filter": {
+        "name": "Es reserva nueva (no cancelacion ni modificacion)",
+        "conditions": [
+          [
+            {
+              "a": "{{1.subject}}",
+              "b": "cancelad",
+              "o": "text:notcontain"
+            },
+            {
+              "a": "{{1.subject}}",
+              "b": "modificad",
+              "o": "text:notcontain"
+            },
+            {
+              "a": "{{1.subject}}",
+              "b": "cancelled",
+              "o": "text:notcontain"
+            }
+          ],
+          [
+            {
+              "a": "{{1.subject}}",
+              "b": "Nueva reserva",
+              "o": "text:contain"
+            }
+          ],
+          [
+            {
+              "a": "{{1.subject}}",
+              "b": "booking confirmed",
+              "o": "text:contain"
+            }
+          ],
+          [
+            {
+              "a": "{{1.subject}}",
+              "b": "New reservation",
+              "o": "text:contain"
+            }
+          ]
+        ]
+      },
+      "metadata": {
+        "designer": { "x": 200, "y": 0 }
+      }
+    },
+    {
+      "id": 3,
+      "module": "http:ActionSendData",
+      "version": 3,
+      "parameters": {
+        "handleErrors": true,
+        "useNewZLibDeCompress": true
+      },
+      "mapper": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{__FILL_IN__GEMINI_API_KEY}}",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "bodyType": "raw",
+        "contentType": "application/json",
+        "body": "{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Extrae del siguiente email de confirmación de Booking.com exactamente estos campos y devuelve SOLO un JSON válido, sin texto adicional:\\n{\\n  \\\"nombre_huesped\\\": \\\"string\\\",\\n  \\\"telefono\\\": \\\"string o null si no aparece\\\",\\n  \\\"fecha_checkin\\\": \\\"DD/MM/YYYY\\\",\\n  \\\"fecha_checkout\\\": \\\"DD/MM/YYYY\\\",\\n  \\\"tipo_habitacion\\\": \\\"string\\\",\\n  \\\"num_personas\\\": 0,\\n  \\\"id_reserva\\\": \\\"string\\\"\\n}\\nEmail:\\n{{replace(replace(1.body.text, '\\\"', '\\\\\\\"'), newline, '\\\\n')}}\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0,\n    \"responseMimeType\": \"application/json\"\n  }\n}"
+      },
+      "metadata": {
+        "designer": { "x": 400, "y": 0 },
+        "expect": [
+          { "name": "url", "type": "url" },
+          { "name": "method", "type": "select" },
+          { "name": "body", "type": "string" }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "module": "json:ParseJSON",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "json": "{{3.body.candidates[].content.parts[].text}}"
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 }
+      }
+    },
+    {
+      "id": 5,
+      "module": "google-sheets:ActionAddRow",
+      "version": 2,
+      "parameters": {
+        "__INSTRUCTION__": "Connect your Google account, select the spreadsheet and sheet",
+        "account": "__FILL_IN__GOOGLE_SHEETS_CONNECTION_ID",
+        "spreadsheetId": "__FILL_IN__SPREADSHEET_ID",
+        "sheetId": "__FILL_IN__SHEET_NAME_Reservas_GHP_2026",
+        "includesHeaders": true,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "insertDataOption": "INSERT_ROWS"
+      },
+      "mapper": {
+        "values": {
+          "ID_Reserva": "{{4.id_reserva}}",
+          "Nombre": "{{4.nombre_huesped}}",
+          "Telefono": "{{4.telefono}}",
+          "Check-in": "{{4.fecha_checkin}}",
+          "Check-out": "{{4.fecha_checkout}}",
+          "Habitacion": "{{4.tipo_habitacion}}",
+          "Personas": "{{4.num_personas}}",
+          "Canal": "Booking.com",
+          "WhatsApp_enviado": "{{if(4.telefono; 'Procesando'; 'Pendiente telefono')}}",
+          "Fecha_registro": "{{formatDate(now; 'DD/MM/YYYY HH:mm')}}",
+          "fecha_upsell": "{{formatDate(addDays(parseDate(4.fecha_checkin; 'DD/MM/YYYY'); -3); 'DD/MM/YYYY')}}",
+          "upsell_enviado": "No"
+        }
+      },
+      "metadata": {
+        "designer": { "x": 800, "y": 0 }
+      }
+    },
+    {
+      "id": 6,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "parameters": {},
+      "metadata": {
+        "designer": { "x": 1000, "y": 0 }
+      },
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 7,
+              "module": "http:ActionSendData",
+              "version": 3,
+              "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+              },
+              "filter": {
+                "name": "Tiene telefono",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{4.telefono}}",
+                      "b": "",
+                      "o": "text:notequal"
+                    },
+                    {
+                      "a": "{{4.telefono}}",
+                      "b": "null",
+                      "o": "text:notequal"
+                    }
+                  ]
+                ]
+              },
+              "mapper": {
+                "__INSTRUCTION__": "360dialog HTTP module — replace with native Twilio module if preferred. See whatsapp_template.md for template name.",
+                "url": "https://waba.360dialog.io/v1/messages",
+                "method": "POST",
+                "headers": [
+                  {
+                    "name": "D360-API-KEY",
+                    "value": "__FILL_IN__360DIALOG_API_KEY"
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "bodyType": "raw",
+                "contentType": "application/json",
+                "body": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{replace(replace(4.telefono; ' '; ''); '+'; '')}}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"__FILL_IN__META_TEMPLATE_NAME\",\n    \"language\": { \"code\": \"es\" },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          { \"type\": \"text\", \"text\": \"{{4.nombre_huesped}}\" },\n          { \"type\": \"text\", \"text\": \"{{4.fecha_checkin}}\" },\n          { \"type\": \"text\", \"text\": \"{{4.fecha_checkout}}\" },\n          { \"type\": \"text\", \"text\": \"{{4.tipo_habitacion}}\" },\n          { \"type\": \"text\", \"text\": \"{{4.id_reserva}}\" }\n        ]\n      }\n    ]\n  }\n}"
+              },
+              "metadata": {
+                "designer": { "x": 1200, "y": -150 }
+              }
+            },
+            {
+              "id": 8,
+              "module": "google-sheets:ActionUpdateRow",
+              "version": 2,
+              "parameters": {
+                "account": "__FILL_IN__GOOGLE_SHEETS_CONNECTION_ID",
+                "spreadsheetId": "__FILL_IN__SPREADSHEET_ID",
+                "sheetId": "__FILL_IN__SHEET_NAME_Reservas_GHP_2026",
+                "includesHeaders": true
+              },
+              "mapper": {
+                "rowNumber": "{{5.__ROW_NUMBER__}}",
+                "values": {
+                  "WhatsApp_enviado": "Si"
+                }
+              },
+              "metadata": {
+                "designer": { "x": 1400, "y": -150 },
+                "__NOTE__": "rowNumber uses the row returned by module 5 (Add Row). In Make.com connect this to 5.__ROW_NUMBER__ after import."
+              }
+            },
+            {
+              "id": 9,
+              "module": "gmail:ActionSendEmail",
+              "version": 1,
+              "parameters": {
+                "account": "__FILL_IN__GMAIL_CONNECTION_ID"
+              },
+              "mapper": {
+                "to": "__FILL_IN__RECEPCION_EMAIL",
+                "subject": "✅ Nueva reserva + WhatsApp enviado — {{4.nombre_huesped}}",
+                "content": "<p>Se ha procesado una nueva reserva y el WhatsApp de bienvenida ha sido enviado automáticamente.</p><ul><li><strong>Nombre:</strong> {{4.nombre_huesped}}</li><li><strong>Teléfono:</strong> {{4.telefono}}</li><li><strong>Check-in:</strong> {{4.fecha_checkin}}</li><li><strong>Check-out:</strong> {{4.fecha_checkout}}</li><li><strong>Habitación:</strong> {{4.tipo_habitacion}}</li><li><strong>Personas:</strong> {{4.num_personas}}</li><li><strong>ID reserva:</strong> {{4.id_reserva}}</li></ul><p><em>Este email es automático. Desactívalo tras 2 semanas de funcionamiento estable.</em></p>",
+                "contentType": "html"
+              },
+              "metadata": {
+                "designer": { "x": 1600, "y": -150 }
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 10,
+              "module": "gmail:ActionSendEmail",
+              "version": 1,
+              "parameters": {
+                "account": "__FILL_IN__GMAIL_CONNECTION_ID"
+              },
+              "filter": {
+                "name": "Sin telefono",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{4.telefono}}",
+                      "b": "",
+                      "o": "text:equal"
+                    }
+                  ],
+                  [
+                    {
+                      "a": "{{4.telefono}}",
+                      "b": "null",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "mapper": {
+                "to": "__FILL_IN__RECEPCION_EMAIL",
+                "subject": "⚠️ Nueva reserva sin teléfono — {{4.nombre_huesped}} ({{4.fecha_checkin}})",
+                "content": "<p>Se ha recibido una nueva reserva de Booking.com pero <strong>no se encontró número de teléfono</strong> en el email de confirmación. El WhatsApp de bienvenida <strong>no ha podido enviarse</strong>.</p><ul><li><strong>Nombre:</strong> {{4.nombre_huesped}}</li><li><strong>Check-in:</strong> {{4.fecha_checkin}}</li><li><strong>Check-out:</strong> {{4.fecha_checkout}}</li><li><strong>ID reserva:</strong> {{4.id_reserva}}</li></ul><p>Por favor, añade el teléfono manualmente en la hoja <em>Reservas_GHP_2026</em> y cambia <em>WhatsApp_enviado</em> a 'Pendiente envío manual'.</p>",
+                "contentType": "html"
+              },
+              "metadata": {
+                "designer": { "x": 1200, "y": 150 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu1.make.com",
+    "__SETUP_NOTES__": [
+      "1. Import this file via Make.com > Scenarios > ... > Import Blueprint",
+      "2. Search for all __FILL_IN__ placeholders and replace with real values",
+      "3. For WhatsApp: create 360dialog account OR use Twilio module (see setup.md)",
+      "4. For Gemini: get API key from aistudio.google.com",
+      "5. Submit the WhatsApp template to Meta BEFORE activating (see whatsapp_template.md)",
+      "6. Test with dummy emails before going live (see setup.md Phase 3)"
+    ]
+  }
+}
