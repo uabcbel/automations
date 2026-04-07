@@ -266,22 +266,153 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(to bottom, rgba(17,29,51,0.4) 0%, rgba(17,29,51,0.2) 40%, rgba(17,29,51,0.7) 75%, rgba(17,29,51,0.95) 100%),
-        linear-gradient(135deg, #1B3A6B 0%, #2C5F8A 35%, #1B4D6E 65%, #0D2B4A 100%);
-      background-size: cover;
-      background-position: center;
+      overflow: hidden;
     }
-    /* Decorative wave overlay */
-    .hero-bg::after {
-      content: '';
+    .hero-bg-video {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(to top, var(--color-navy-dark), transparent);
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
     }
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        to bottom,
+        rgba(17,29,51,0.35) 0%,
+        rgba(17,29,51,0.15) 35%,
+        rgba(17,29,51,0.65) 70%,
+        rgba(17,29,51,0.96) 100%
+      );
+    }
+    /* play button */
+    .hero-play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: var(--color-white);
+      padding: 11px 22px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition);
+      backdrop-filter: blur(4px);
+    }
+    .hero-play-btn:hover { background: rgba(255,255,255,0.22); }
+    .play-circle {
+      width: 32px; height: 32px;
+      background: var(--color-gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      color: var(--color-navy-dark);
+      padding-left: 2px;
+    }
+    /* Video modal */
+    .video-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.88);
+      align-items: center;
+      justify-content: center;
+    }
+    .video-modal.open { display: flex; }
+    .video-modal-inner {
+      position: relative;
+      width: min(900px, 95vw);
+      aspect-ratio: 16/9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    .video-modal-inner iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .video-modal-close {
+      position: absolute;
+      top: -44px;
+      right: 0;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.8;
+    }
+    .video-modal-close:hover { opacity: 1; }
+    /* Gallery section */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    @media (min-width: 640px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 960px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); } }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      aspect-ratio: 1;
+    }
+    .gallery-item.tall { grid-row: span 2; aspect-ratio: auto; }
+    .gallery-item.wide { grid-column: span 2; aspect-ratio: auto; height: 220px; }
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(17,29,51,0);
+      transition: background var(--transition-slow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gallery-item:hover .gallery-item-overlay { background: rgba(17,29,51,0.3); }
+    .gallery-expand {
+      color: white;
+      font-size: 1.5rem;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all var(--transition-slow);
+    }
+    .gallery-item:hover .gallery-expand { opacity: 1; transform: scale(1); }
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.92);
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: var(--radius-md);
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: fixed;
+      top: 20px; right: 28px;
+      color: white; font-size: 2rem;
+      cursor: pointer; opacity: 0.8; line-height: 1;
+    }
+    .lightbox-close:hover { opacity: 1; }
     .hero-content {
       position: relative;
       z-index: 2;
@@ -1171,6 +1302,7 @@
         <li><a href="#habitaciones">Habitaciones</a></li>
         <li><a href="#spa">Spa</a></li>
         <li><a href="#gastronomia">Gastronomía</a></li>
+        <li><a href="#galeria">Galería</a></li>
         <li><a href="#ofertas">Ofertas</a></li>
         <li><a href="#ubicacion">Ubicación</a></li>
         <li><a href="#contacto">Contacto</a></li>
@@ -1207,8 +1339,29 @@
   <!-- ============================================================
        HERO
   ============================================================ -->
+  <!-- Video Modal -->
+  <div class="video-modal" id="videoModal" onclick="if(event.target===this)closeVideo()">
+    <div class="video-modal-inner">
+      <span class="video-modal-close" onclick="closeVideo()">×</span>
+      <iframe id="videoFrame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="document.getElementById('lightbox').classList.remove('open')">
+    <span class="lightbox-close">×</span>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
   <section class="hero" id="inicio">
-    <div class="hero-bg"></div>
+    <div class="hero-bg">
+      <img
+        class="hero-bg-video"
+        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80"
+        alt="Costa del Azahar — Primera línea de playa"
+      />
+      <div class="hero-bg-overlay"></div>
+    </div>
     <div class="hero-content container">
       <div class="hero-badge">⭐⭐⭐⭐ Hotel · Costa del Azahar</div>
       <h1 class="hero-title">El mar, la historia<br>y el <em>descanso perfecto</em></h1>
@@ -1216,6 +1369,9 @@
       <div class="hero-ctas">
         <a href="#reservar" class="btn btn-primary" style="font-size:1rem;padding:16px 32px;">Reservar directo — mejor precio garantizado</a>
         <a href="#habitaciones" class="btn btn-outline-white">Ver habitaciones</a>
+        <button class="hero-play-btn" onclick="openVideo('ySLdFZMw-k4')">
+          <span class="play-circle">▶</span> Ver el hotel
+        </button>
       </div>
 
       <!-- Booking Widget -->
@@ -1318,7 +1474,9 @@
         <!-- Card 1 -->
         <div class="room-card reveal" data-category="estandar">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#2C3E50,#4A6080);display:flex;align-items:center;justify-content:center;font-size:3rem;">🛏️</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80" alt="Doble Estándar" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Estándar</span>
           </div>
           <div class="room-card-body">
@@ -1342,7 +1500,9 @@
         <!-- Card 2 -->
         <div class="room-card reveal" data-category="mar">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#1a4a6b,#2980b9);display:flex;align-items:center;justify-content:center;font-size:3rem;">🌊</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80" alt="Doble Vista Mar" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Vista Mar</span>
             <span class="sea-view-tag">⭐ Popular</span>
           </div>
@@ -1367,7 +1527,9 @@
         <!-- Card 3 -->
         <div class="room-card reveal" data-category="familia">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#1B4332,#2D6A4F);display:flex;align-items:center;justify-content:center;font-size:3rem;">👨‍👩‍👧</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80" alt="Habitación Familiar" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Familias</span>
           </div>
           <div class="room-card-body">
@@ -1391,7 +1553,9 @@
         <!-- Card 4 -->
         <div class="room-card reveal" data-category="suite">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#4A1942,#6B2D5E);display:flex;align-items:center;justify-content:center;font-size:3rem;">👑</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80" alt="Junior Suite" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Suite</span>
             <span class="sea-view-tag">🌊 Vista mar</span>
           </div>
@@ -1416,7 +1580,9 @@
         <!-- Card 5 -->
         <div class="room-card reveal" data-category="suite mar">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#7D4F00,#C9A55A);display:flex;align-items:center;justify-content:center;font-size:3rem;">🌟</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" alt="Gran Suite Presidencial" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Gran Suite</span>
             <span class="sea-view-tag">Premium</span>
           </div>
@@ -1441,7 +1607,9 @@
         <!-- Card 6 -->
         <div class="room-card reveal" data-category="estandar">
           <div class="room-card-img">
-            <div class="room-card-img-bg" style="background: linear-gradient(135deg,#2C3E50,#566573);display:flex;align-items:center;justify-content:center;font-size:3rem;">🌙</div>
+            <div class="room-card-img-bg" style="background:#1B2B4B;">
+              <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80" alt="Doble Superior" style="width:100%;height:100%;object-fit:cover;" />
+            </div>
             <span class="room-tag">Estándar</span>
           </div>
           <div class="room-card-body">
@@ -1473,8 +1641,8 @@
     <div class="container">
       <div class="spa-layout">
         <div class="spa-visual reveal">
-          <div class="spa-visual-bg">
-            <span class="spa-icon-large">💆</span>
+          <div class="spa-visual-bg" style="background:none;padding:0;">
+            <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80" alt="Gran Wellness Spa" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg);" />
           </div>
           <div class="spa-badge-overlay">
             <div class="num">2.500 m²</div>
@@ -1531,7 +1699,9 @@
       </div>
       <div class="dining-grid">
         <div class="dining-card reveal">
-          <div class="dining-card-img" style="background:linear-gradient(135deg,#7B3F00,#C0822A);">🍽️</div>
+          <div class="dining-card-img" style="background:#1B2B4B;padding:0;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=700&q=80" alt="Restaurante Principal" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
           <div class="dining-card-body">
             <div class="dining-card-name">Restaurante Principal</div>
             <div class="dining-card-desc">Buffet internacional con show-cooking en directo. Desayuno, almuerzo y cena con menú infantil, opciones vegetarianas y sección de alergias claramente señalizada.</div>
@@ -1539,7 +1709,9 @@
           </div>
         </div>
         <div class="dining-card reveal">
-          <div class="dining-card-img" style="background:linear-gradient(135deg,#1a5276,#2980b9);">🍹</div>
+          <div class="dining-card-img" style="background:#1B2B4B;padding:0;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=700&q=80" alt="Bar de Piscina" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
           <div class="dining-card-body">
             <div class="dining-card-name">Bar de Piscina</div>
             <div class="dining-card-desc">Cócteles clásicos y de autor, aperitivos mediterráneos y snacks ligeros. El lugar perfecto para disfrutar del atardecer frente al mar con una bebida en la mano.</div>
@@ -1547,7 +1719,9 @@
           </div>
         </div>
         <div class="dining-card reveal">
-          <div class="dining-card-img" style="background:linear-gradient(135deg,#1B4332,#40916C);">☕</div>
+          <div class="dining-card-img" style="background:#1B2B4B;padding:0;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=700&q=80" alt="Cafetería y Lobby Bar" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
           <div class="dining-card-body">
             <div class="dining-card-name">Cafetería & Lobby Bar</div>
             <div class="dining-card-desc">Desayunos continentales, meriendas, repostería artesanal y carta de infusiones. Disponible para huéspedes y visitantes durante todo el día.</div>
@@ -1558,6 +1732,58 @@
       <div style="text-align:center;margin-top:48px;" class="reveal">
         <p style="font-size:0.88rem;color:var(--color-muted);margin-bottom:16px;">¿Tienes una intolerancia o alergia alimentaria? Comunícanoslo al reservar y lo tenemos todo preparado para ti.</p>
         <a href="tel:+34964480600" class="btn btn-outline-gold">📞 Consultar carta y disponibilidad</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       GALERÍA
+  ============================================================ -->
+  <section class="section section--cream-dark" id="galeria" style="padding-top:64px;padding-bottom:64px;">
+    <div class="container">
+      <div class="section-header center reveal" style="margin-bottom:36px;">
+        <span class="section-label">Galería</span>
+        <h2 class="section-title">El hotel en imágenes</h2>
+        <div class="gold-divider"><span>✦</span></div>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item tall reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Piscina exterior" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" alt="Playa primera línea" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80" alt="Fachada del hotel" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item wide reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80" alt="Spa y bienestar" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80" alt="Suite de lujo" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" alt="Restaurante" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80" alt="Vista al mar" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+        <div class="gallery-item reveal" onclick="openLightbox(this)">
+          <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80" alt="Habitación premium" loading="lazy" />
+          <div class="gallery-item-overlay"><span class="gallery-expand">⤢</span></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:32px;" class="reveal">
+        <button class="btn btn-outline-gold" onclick="openVideo('ySLdFZMw-k4')">
+          <span style="font-size:1rem;">▶</span> Ver vídeo del hotel
+        </button>
       </div>
     </div>
   </section>
@@ -2109,6 +2335,30 @@
       // Auto-advance
       setInterval(() => goTo((current + 1) % total), 5000);
     })();
+
+    // ── Video modal ──────────────────────────────────────────────
+    function openVideo(id) {
+      document.getElementById('videoFrame').src =
+        `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+      document.getElementById('videoModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeVideo() {
+      document.getElementById('videoFrame').src = '';
+      document.getElementById('videoModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeVideo(); document.getElementById('lightbox').classList.remove('open'); }
+    });
+
+    // ── Gallery lightbox ─────────────────────────────────────────
+    function openLightbox(el) {
+      const img = el.querySelector('img');
+      document.getElementById('lightboxImg').src = img.src.replace('w=800','w=1400');
+      document.getElementById('lightboxImg').alt = img.alt;
+      document.getElementById('lightbox').classList.add('open');
+    }
 
     // ── Scroll reveal (IntersectionObserver) ────────────────────
     const observer = new IntersectionObserver((entries) => {
