@@ -1,5 +1,7 @@
 # Guía de uso — Flujo 4 Respuesta automática a reseñas
 
+> 🎥 **Grabación de demostración:** [Ver en Google Drive](https://drive.google.com/drive/u/0/folders/1-Y7e6nToiQ55_jd0bfC1ycE78PKzbrkB?ths=true) — Recording Apr 25, 2026
+
 ## Qué hace este flujo
 
 El comando `/responder_reseñas` automatiza la revisión de reseñas sin respuesta y la generación de borradores listos para publicar. Cuando se ejecuta con una página de reseñas del hotel abierta en el navegador, el asistente de IA:
