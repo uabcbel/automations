@@ -1,5 +1,7 @@
 # Guía de activación — Flujo 1 Bienvenida WhatsApp (v2.0)
 
+> 📄 **Documento de diseño:** [Flujo1\_WhatsApp\_Bienvenida\_GHP\_v2](https://docs.google.com/document/d/1Jo5dWySuYBuowUmCWrI4CAkvFUr-OJ9D8q9eNf1hgXo/edit) *(Google Drive — acceso interno)*
+
 ## Resumen del flujo
 
 ```

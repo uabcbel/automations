@@ -1,5 +1,7 @@
 # Guía de activación — Flujo 2 Upselling Pre-Llegada (v2.0)
 
+> 📄 **Documento de diseño:** [Flujo2\_Upselling\_Prellegada\_GHP\_v2](https://docs.google.com/document/d/1WTW2VcbqysJXW_6XTkUQG71sSsNlVWbqrSQN_r3_5fM/edit) *(Google Drive — acceso interno)*
+
 ## Prerrequisito obligatorio
 
 **El Flujo 1 debe llevar al menos 1 semana activo** y la hoja `Reservas_GHP_2026` debe tener reservas reales con `fecha_upsell` calculada. Activar este flujo antes significa que no habrá filas con `fecha_upsell` en el futuro próximo y el escenario correrá en vacío.
