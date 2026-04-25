@@ -10,14 +10,14 @@ Flows are organized in three tiers by complexity. Each tier builds on the previo
 
 ### Tier 1 — Quick Wins
 
-> Deployable in an afternoon. Requires PMS→Mailchimp sync (already active at GHP via Acigrup).
+> Flows 1–2 require PMS→Mailchimp sync (already active at GHP via Acigrup). Flow 4 requires only a Claude browser extension.
 
 | # | Flow | What it does | Stack | Status |
 |---|------|-------------|-------|--------|
 | 1 | [Bienvenida automática por WhatsApp](flujo1-bienvenida-whatsapp/) | When PMS Acigrup syncs a reservation to Mailchimp (subscribe or profile_update), instantly sends a personalized WhatsApp to the guest. Covers all OTAs connected to the PMS. Also handles modifications: re-sends only if check-in date, room type, or guest count changes. Writes every reservation to a central Sheets log that feeds Flow 2. | Make.com · Mailchimp · WhatsApp Business API · Sheets | **Ready** |
 | 2 | [Upselling pre-llegada](flujo2-upselling-prellegada/) | 3 days before check-in, reads from the Sheets log populated by Flow 1 and uses Gemini to generate a personalized WhatsApp offering room upgrade, parking, spa, or dinner. Sector conversion rate: 8–12% on WhatsApp vs. 2–5% on email. Requires Flow 1 active for at least 1 week. | Make.com · Gemini · WhatsApp Business API · Sheets | **Ready** |
 | 3 | Check-in online + registro policial | Sends the pre-check-in link 24h before arrival. When the guest completes the form, Make automatically formats the data for the Guardia Civil (Parte de Viajeros). Fewer queues at reception, zero missed filings. | Make.com · Google Forms / Typeform · Sheets | Planned |
-| 4 | Respuesta automática a reseñas | Every new review on Google or Booking triggers a Make scenario that uses Gemini to draft a brand-aligned response and publishes it automatically. Reputation always attended, no staff hours spent. | Make.com · Google Business API · Gemini | Planned |
+| 4 | [Respuesta a reseñas con IA](flujo4-respuesta-resenas/) | Run the `/responder_reseñas` command in Claude (browser extension) on any review page (Google, TripAdvisor, Booking.com). The AI scans all unanswered reviews, analyses sentiment, and drafts a personalised ~120-word reply in the reviewer's language — ready to copy and publish. No Make.com required. | Claude (browser extension) | **Ready** |
 
 ---
 
