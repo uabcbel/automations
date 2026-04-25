@@ -29,14 +29,14 @@ Flows are organised in three tiers by complexity. Each tier builds on the previo
 
 ### Tier 1 — Quick Wins
 
-> Flows 1–2 require PMS→Mailchimp sync (already active at GHP via Acigrup). Flow 4 requires only a Claude browser extension.
+> Flows 1–2 require PMS→Mailchimp sync (already active at GHP via Acigrup). Flow 4 requires only **Claude in Chrome** (Anthropic's free browser extension — install once, no integrations).
 
 | # | Flow | What it does | Stack | Status | Legacy Status |
 |---|------|-------------|-------|--------|---------------|
 | 1 | [Bienvenida automática por WhatsApp](flujo1-bienvenida-whatsapp/) | When PMS Acigrup syncs a reservation to Mailchimp (subscribe or profile_update), instantly sends a personalized WhatsApp to the guest. Covers all OTAs connected to the PMS. Also handles modifications: re-sends only if check-in date, room type, or guest count changes. Writes every reservation to a central Sheets log that feeds Flow 2. | Make.com · Mailchimp · WhatsApp Business API · Sheets | **Ready** | — |
 | 2 | [Upselling pre-llegada](flujo2-upselling-prellegada/) | 3 days before check-in, reads from the Sheets log populated by Flow 1 and uses Gemini to generate a personalized WhatsApp offering room upgrade, parking, spa, or dinner. Sector conversion rate: 8–12% on WhatsApp vs. 2–5% on email. Requires Flow 1 active for at least 1 week. | Make.com · Gemini · WhatsApp Business API · Sheets | **Ready** | ✅ Email upselling already live via Mailchimp — this flow adds the WhatsApp channel |
 | 3 | Check-in online + registro policial | Sends the pre-check-in link 24h before arrival. When the guest completes the form, Make automatically formats the data for the Guardia Civil (Parte de Viajeros). Fewer queues at reception, zero missed filings. | Make.com · Google Forms / Typeform · Sheets | Planned | ✅ Fully covered by PMS — online check-in (email) and Guardia Civil registration both automated from Acigrup |
-| 4 | [Respuesta a reseñas con IA](flujo4-respuesta-resenas/) | Run the `/responder_reseñas` command in Claude (browser extension) on any review page (Google, TripAdvisor, Booking.com). The AI scans all unanswered reviews, analyses sentiment, and drafts a personalised ~120-word reply in the reviewer's language — ready to copy and publish. | Claude (browser extension) | **Ready** | ⚠️ Manual — staff currently copy reviews into ChatGPT and paste responses |
+| 4 | [Respuesta a reseñas con IA](flujo4-respuesta-resenas/) | Uses **Claude in Chrome** (Anthropic's official browser extension). Open the reviews page, type `/responder_reseñas` in the Claude panel — no copy-paste, no integrations. Claude reads the page and drafts a ~120-word personalised reply per unanswered review in the reviewer's language. Staff reviews, copies, and publishes. No maintenance required. | Claude in Chrome | **Ready** | ⚠️ Manual — staff currently copy reviews into ChatGPT and paste responses |
 
 ---
 
@@ -84,6 +84,7 @@ Flow 1 must be activated first — it populates the Sheets log that Flow 2 reads
 | Orchestration | Make.com (Core plan, ~10 €/month) |
 | Reservation data source | Mailchimp (PMS Acigrup syncs via webhook) |
 | AI — message generation | Gemini 1.5 Flash via Google AI Studio |
+| AI — review responses (Flow 4) | Claude in Chrome (Anthropic browser extension) |
 | Messaging | WhatsApp Business API via 360dialog |
 | Data storage | Google Sheets (source of truth for all flows) |
 | Email | Gmail (hotel account) |

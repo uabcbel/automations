@@ -1,6 +1,6 @@
 # Comando /responder_reseñas
 
-Copia el bloque completo a continuación y pégalo en el chat de tu asistente de IA (Claude u otro con acceso al navegador) cuando tengas abierta la página de reseñas del hotel.
+Copia el bloque completo a continuación y escríbelo (o pégalo) en el panel de **Claude in Chrome** cuando tengas abierta la página de reseñas del hotel. Claude in Chrome lee automáticamente la pestaña activa — no hace falta copiar el contenido de la página.
 
 No modifiques la estructura de los pasos ni el formato de salida. Solo actualiza la línea de cierre del Paso 3 si el nombre del hotel cambia.
 
