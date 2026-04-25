@@ -1,8 +1,9 @@
 # Guía de uso — Flujo 4 Respuesta automática a reseñas
 
-> 🎥 **Grabación de demostración:** [Ver en Google Drive](https://drive.google.com/drive/u/0/folders/1-Y7e6nToiQ55_jd0bfC1ycE78PKzbrkB?ths=true) — Recording Apr 25, 2026
+> 📄 **Documento de diseño:** [Cómo Usar /responder\_reseñas — Guía de Usuario](https://docs.google.com/document/d/1ayKV0h-ukufhcIAMAEHZxXiueS94nJ0W4kBXI5t1BYk/edit) *(Google Drive — acceso interno)*
 >
-> **Cómo ver el vídeo:** Salta directamente al minuto 0 para ver cómo se lanza el comando (primeros 2 minutos), luego salta al **minuto 7** para ver las propuestas finales ya generadas. El proceso intermedio de generación tarda algo más de lo habitual en este vídeo.
+> 🎥 **Grabación de demostración:** [Ver en Google Drive](https://drive.google.com/drive/u/0/folders/1-Y7e6nToiQ55_jd0bfC1ycE78PKzbrkB?ths=true) — Recording Apr 25, 2026
+> **Cómo ver el vídeo:** Primeros 2 minutos para ver cómo se lanza el comando → salta al **minuto 7** para ver las propuestas finales. El proceso intermedio de generación tarda algo más de lo habitual en este vídeo.
 
 ## Qué hace este flujo
 
